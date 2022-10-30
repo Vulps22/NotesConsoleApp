@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Notes
 {
@@ -9,6 +11,7 @@ namespace Notes
 
         public NoteManager(){
             notes = new List<Note>();
+            load();
         }
 
         public void list(){
@@ -20,10 +23,10 @@ namespace Notes
             {
                 Note note = notes.ElementAt(i);
                 Console.WriteLine(" ");
-                Console.WriteLine(i + ":   " + note.getTitle());
+                Console.WriteLine(i + ":   " + note.title);
                 Console.WriteLine("------");
                 Console.WriteLine(" ");
-                Console.WriteLine(note.getText());
+                Console.WriteLine(note.text);
                 Console.WriteLine(" ");
                 
             }
@@ -35,6 +38,7 @@ namespace Notes
             Console.WriteLine("Text: ");
             string text = Console.ReadLine() ?? "";
             this.notes.Add(new Note(title, text));
+            save();
         }
 
         public void deleteNote(){
@@ -42,7 +46,7 @@ namespace Notes
             for (int i = 0; i < notes.Count(); i++)
             {
                 Note note = notes.ElementAt(i);
-                Console.WriteLine(i + ": " + note.getTitle());
+                Console.WriteLine(i + ": " + note.title);
             }
             Console.WriteLine("Which note to delete?");
             string option = Console.ReadLine() ?? "-1";
@@ -50,7 +54,21 @@ namespace Notes
             if(index > -1 && index <= notes.Count()){
                 notes.RemoveAt(index);
             }
+
+            save();
+        }
+
+        private void save(){
+            string json = JsonSerializer.Serialize(notes.ToArray());
+            File.WriteAllText(@"C:\Users\ajmca\OneDrive\Documents\notes.json", json) ;
+        }
+
+        private void load(){
+        {
+            string json = File.ReadAllText(@"C:\Users\ajmca\OneDrive\Documents\notes.json");
+
+            notes = JsonSerializer.Deserialize<List<Note>>(json);
+        }
         }
     }
-
 }
